@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 coins-core = { version = "0.1.0", path = "../coins-core" }
+pretty-sqlite = "0.1.0"
