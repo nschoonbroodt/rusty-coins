@@ -42,10 +42,10 @@ mod tests {
     use super::super::CoinsModel;
 
     #[test]
-    fn test_display_commodities() {
+    fn test_commodities() {
         let model = CoinsModel::new(None).unwrap();
         let conn = &model.conn;
-        // TODO: movo this to a test
+
         conn.execute(
             r#"INSERT INTO commodities (name, symbol) VALUES ("Euro", "EUR")"#,
             (),
@@ -57,6 +57,9 @@ mod tests {
             pretty_sqlite::pretty_table(conn, "commodities").unwrap()
         );
 
-        println!("{:?}", model.commodities().unwrap());
+        let commodities = model.commodities().unwrap();
+        assert_eq!(commodities.len(), 1);
+        assert_eq!(commodities[0].name(), "Euro");
+        assert_eq!(commodities[0].symbol(), "EUR");
     }
 }

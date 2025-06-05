@@ -34,17 +34,17 @@ mod tests {
     use super::super::CoinsModel;
 
     #[test]
-    fn test_display_accounts() {
+    fn test_accounts() {
         let model = CoinsModel::new(None).unwrap();
         let conn = &model.conn;
-        // TODO: movo this to a test
+
         conn.execute(r#"INSERT INTO accounts (name) VALUES ("Account1")"#, ())
-            .unwrap();
-        conn.execute(r#"UPDATE accounts SET name = "Account1_1""#, ())
             .unwrap();
 
         println!("{}", pretty_sqlite::pretty_table(conn, "accounts").unwrap());
 
-        println!("{:?}", model.accounts().unwrap());
+        let accounts = model.accounts().unwrap();
+        assert_eq!(accounts.len(), 1);
+        assert_eq!(accounts[0].name(), "Account1");
     }
 }
