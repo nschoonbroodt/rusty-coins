@@ -1,4 +1,5 @@
 pub mod account;
+pub mod commodity;
 
 use std::sync::LazyLock;
 

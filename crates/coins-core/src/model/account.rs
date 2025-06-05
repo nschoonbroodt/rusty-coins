@@ -6,6 +6,12 @@ pub struct Account {
     name: String,
 }
 
+impl Account {
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+}
+
 impl super::CoinsModel {
     pub fn accounts(&self) -> Result<Vec<Account>> {
         let mut stmt = self.conn.prepare("SELECT id, name FROM accounts")?;
