@@ -1,3 +1,5 @@
+pub mod account;
+
 use std::sync::LazyLock;
 
 use crate::prelude::*;
@@ -34,18 +36,5 @@ mod tests {
     #[test]
     fn test_new() {
         let _model = CoinsModel::new(None).unwrap();
-    }
-
-    #[test]
-    fn test_display_accounts() {
-        let model = CoinsModel::new(None).unwrap();
-        let conn = &model.conn;
-        // TODO: movo this to a test
-        conn.execute(r#"INSERT INTO accounts (name) VALUES ("Account1")"#, ())
-            .unwrap();
-        conn.execute(r#"UPDATE accounts SET name = "Account1_1""#, ())
-            .unwrap();
-
-        println!("{}", pretty_sqlite::pretty_table(conn, "accounts").unwrap());
     }
 }
