@@ -24,13 +24,29 @@ impl CoinsModel {
         };
         MIGRATIONS.to_latest(&mut conn).unwrap();
 
-        // TODO: movo this to a test
-        conn.execute(r#"INSERT INTO accounts (name) VALUES ("Nicolas")"#, ());
-        std::thread::sleep(time::Duration::from_secs(1));
-        conn.execute(r#"INSERT INTO accounts (name) VALUES ("Nicolas")"#, ());
-        std::thread::sleep(time::Duration::from_secs(1));
-        conn.execute(r#"UPDATE accounts SET name = "Nada""#, ());
-
         Ok(Self { conn: conn })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let _model = CoinsModel::new(None).unwrap();
+    }
+
+    #[test]
+    fn test_display_accounts() {
+        let model = CoinsModel::new(None).unwrap();
+        let conn = &model.conn;
+        // TODO: movo this to a test
+        conn.execute(r#"INSERT INTO accounts (name) VALUES ("Account1")"#, ())
+            .unwrap();
+        conn.execute(r#"UPDATE accounts SET name = "Account1_1""#, ())
+            .unwrap();
+
+        println!("{}", pretty_sqlite::pretty_table(conn, "accounts").unwrap());
     }
 }

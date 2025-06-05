@@ -28,7 +28,6 @@ name = "coins-cli"
 version = "0.1.0"
 dependencies = [
  "coins-core",
- "pretty-sqlite",
 ]
 
 [[package]]
@@ -36,6 +35,7 @@ name = "coins-core"
 version = "0.1.0"
 dependencies = [
  "include_dir",
+ "pretty-sqlite",
  "rusqlite",
  "rusqlite_migration",
  "thiserror",
