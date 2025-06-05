@@ -2,7 +2,6 @@ use std::sync::LazyLock;
 
 use crate::prelude::*;
 
-use core::time;
 use include_dir::{Dir, include_dir};
 use rusqlite_migration::Migrations;
 
@@ -24,7 +23,7 @@ impl CoinsModel {
         };
         MIGRATIONS.to_latest(&mut conn).unwrap();
 
-        Ok(Self { conn: conn })
+        Ok(Self { conn })
     }
 }
 
