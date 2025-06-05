@@ -5,7 +5,7 @@ use crate::prelude::*;
 use include_dir::{Dir, include_dir};
 use rusqlite_migration::Migrations;
 
-static MIGRATION_DIR: Dir = include_dir!("crates/coins-core/migrations");
+static MIGRATION_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/migrations");
 // Define migrations. These are applied atomically.
 static MIGRATIONS: LazyLock<Migrations<'static>> =
     LazyLock::new(|| Migrations::from_directory(&MIGRATION_DIR).unwrap());
