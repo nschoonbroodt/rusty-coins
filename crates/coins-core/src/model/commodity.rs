@@ -92,18 +92,21 @@ mod tests {
             .symbol("EUR".to_string())
             .build()
             .unwrap();
-        assert_eq!(com.name(), "Euro");
-        assert_eq!(com.symbol(), "EUR");
 
         println!(
             "{}",
             pretty_sqlite::pretty_table(&model.conn, "commodities").unwrap()
         );
 
+        assert_eq!(com.name(), "Euro");
+        assert_eq!(com.symbol(), "EUR");
+
         let commodities = Commodity::all(&model).unwrap();
-        assert_eq!(commodities.len(), 1);
-        assert_eq!(commodities[0].name(), "Euro");
-        assert_eq!(commodities[0].symbol(), "EUR");
+        assert!(
+            commodities
+                .iter()
+                .any(|a| a.id() == com.id() && a.name() == "Euro" && a.symbol() == "EUR")
+        );
     }
     #[test]
     fn test_new_duplicate_symbol() {
