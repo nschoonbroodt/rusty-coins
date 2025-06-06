@@ -7,7 +7,8 @@ create table if not exists prices (
     created_at text default current_timestamp,
     updated_at text default current_timestamp,
     foreign key (commodity_id) references commodities(id),
-    foreign key (base_commodity_id) references commodities(id)
+    foreign key (base_commodity_id) references commodities(id),
+    unique(commodity_id, base_commodity_id, date)
 ) strict;
 
 create trigger insert_prices_trigger

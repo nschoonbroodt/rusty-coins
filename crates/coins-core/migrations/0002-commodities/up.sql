@@ -1,7 +1,7 @@
 create table if not exists commodities (
     id integer primary key autoincrement,
     name text not null,
-    symbol text not null,
+    symbol text not null unique,
     created_at text default current_timestamp,
     updated_at text default current_timestamp
 ) strict;
