@@ -5,8 +5,16 @@ fn main() {
     let com: Commodity = Commodity::builder(&model)
         .name("Euro".to_string())
         .symbol("EUR".to_string())
-        .build();
-
+        .build()
+        .unwrap();
     println!("New commodity: {:?}", com);
+
+    let com: Commodity = Commodity::builder(&model)
+        .name("US Dollar".to_string())
+        .symbol("USD".to_string())
+        .build()
+        .unwrap();
+    println!("New commodity: {:?}", com);
+
     println!("All commodities: {:?}", Commodity::all(&model).unwrap());
 }

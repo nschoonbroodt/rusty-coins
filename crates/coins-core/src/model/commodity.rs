@@ -15,8 +15,17 @@ impl Commodity {
         #[builder(start_fn)] model: &super::CoinsModel,
         name: String,
         symbol: String,
-    ) -> Self {
-        todo!();
+    ) -> Result<Self> {
+        let mut stmt = model.conn.prepare(
+            "INSERT INTO commodities (name, symbol) VALUES (?1, ?2) RETURNING id, name, symbol",
+        )?;
+        let mut commodity_rows = stmt.query(rusqlite::params![name, symbol])?;
+        let row = commodity_rows.next()?.unwrap();
+        Ok(Self {
+            id: row.get(0)?,
+            name: row.get(1)?,
+            symbol: row.get(2)?,
+        })
     }
     pub fn id(&self) -> i64 {
         self.id
