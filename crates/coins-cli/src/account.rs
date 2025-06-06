@@ -1,5 +1,5 @@
 use clap::Parser;
-use coins_core::model::account::Account;
+use coins_core::model::account::{Account, AccountName};
 
 #[derive(Parser, Debug)]
 pub struct AccountOpt {
@@ -32,6 +32,7 @@ fn list(model: &coins_core::CoinsModel) -> anyhow::Result<()> {
 }
 
 fn add(model: &coins_core::CoinsModel, name: String) -> anyhow::Result<()> {
+    let name = AccountName::new(&name).unwrap();
     let account = Account::builder(model).name(name).build()?;
     println!("Added account with ID: {}", account.id());
     Ok(())
