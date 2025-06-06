@@ -25,7 +25,8 @@ fn list(model: &coins_core::CoinsModel) -> anyhow::Result<()> {
     let commodities = Commodity::all(model)?;
     commodities.iter().for_each(|commodity| {
         println!(
-            "Commodity Name: {}, Symbol: {}",
+            "Commodity ID: {}, Name: {}, Symbol: {}",
+            commodity.id(),
             commodity.name(),
             commodity.symbol(),
         );
