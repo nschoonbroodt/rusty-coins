@@ -128,4 +128,22 @@ mod tests {
         let accounts = Account::all(&model).unwrap();
         assert!(!accounts.iter().any(|a| a.id() == account_id));
     }
+
+    #[test]
+    fn test_get_account_by_id() {
+        let model = CoinsModel::new(None).unwrap();
+        let account = Account::builder(&model)
+            .name("Account to Retrieve".to_string())
+            .build()
+            .unwrap();
+
+        println!(
+            "{}",
+            pretty_sqlite::pretty_table(&model.conn, "accounts").unwrap()
+        );
+
+        let retrieved_account = Account::by_id(&model, account.id()).unwrap();
+        assert!(retrieved_account.is_some());
+        assert_eq!(retrieved_account.unwrap().name(), "Account to Retrieve");
+    }
 }
