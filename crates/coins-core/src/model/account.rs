@@ -157,7 +157,7 @@ mod tests {
     fn test_get_account_by_id() {
         let model = CoinsModel::new(None).unwrap();
         let account = Account::builder(&model)
-            .name(AccountName::new("Account to Retrieve").unwrap())
+            .name(AccountName::new("Assets:Account to Retrieve").unwrap())
             .build()
             .unwrap();
 
@@ -168,6 +168,9 @@ mod tests {
 
         let retrieved_account = Account::by_id(&model, account.id()).unwrap();
         assert!(retrieved_account.is_some());
-        assert_eq!(retrieved_account.unwrap().name().0, "Account to Retrieve");
+        assert_eq!(
+            retrieved_account.unwrap().name().0,
+            "Assets:Account to Retrieve"
+        );
     }
 }
