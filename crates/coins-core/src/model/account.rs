@@ -22,6 +22,29 @@ impl Account {
         })
     }
 
+    pub fn delete(self, model: &super::CoinsModel) -> Result<()> {
+        model.conn.execute(
+            "DELETE FROM accounts WHERE id = ?1",
+            rusqlite::params![self.id],
+        )?;
+        Ok(())
+    }
+
+    pub fn by_id(model: &super::CoinsModel, id: i64) -> Result<Option<Self>> {
+        let mut stmt = model
+            .conn
+            .prepare("SELECT id, name FROM accounts WHERE id = ?1")?;
+        let mut rows = stmt.query(rusqlite::params![id])?;
+        if let Some(row) = rows.next()? {
+            Ok(Some(Self {
+                id: row.get(0)?,
+                name: row.get(1)?,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
+
     pub fn id(&self) -> i64 {
         self.id
     }
@@ -83,5 +106,26 @@ mod tests {
 
         let accounts = Account::all(&model).unwrap();
         assert!(accounts.iter().any(|a| a.id() == account.id()));
+    }
+
+    #[test]
+    fn test_delete_account() {
+        let model = CoinsModel::new(None).unwrap();
+        let account = Account::builder(&model)
+            .name("Account to Delete".to_string())
+            .build()
+            .unwrap();
+
+        println!(
+            "{}",
+            pretty_sqlite::pretty_table(&model.conn, "accounts").unwrap()
+        );
+
+        let account_id = account.id();
+
+        account.delete(&model).unwrap();
+
+        let accounts = Account::all(&model).unwrap();
+        assert!(!accounts.iter().any(|a| a.id() == account_id));
     }
 }

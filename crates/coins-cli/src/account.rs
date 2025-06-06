@@ -11,12 +11,14 @@ pub struct AccountOpt {
 enum Command {
     List,
     Add { name: String },
+    Delete { id: i64 },
 }
 
 pub fn run(model: &coins_core::CoinsModel, account_opt: AccountOpt) -> anyhow::Result<()> {
     match &account_opt.command {
         Command::List => list(model)?,
         Command::Add { name } => add(model, name.clone())?,
+        Command::Delete { id } => delete(model, *id)?,
     }
     Ok(())
 }
@@ -32,5 +34,16 @@ fn list(model: &coins_core::CoinsModel) -> anyhow::Result<()> {
 fn add(model: &coins_core::CoinsModel, name: String) -> anyhow::Result<()> {
     let account = Account::builder(model).name(name).build()?;
     println!("Added account with ID: {}", account.id());
+    Ok(())
+}
+
+fn delete(model: &coins_core::CoinsModel, id: i64) -> anyhow::Result<()> {
+    let account = Account::by_id(model, id)?;
+    if let Some(account) = account {
+        println!("Deleting account with ID: {}", account.id());
+        account.delete(model)?;
+    } else {
+        println!("No account found with ID: {}", id);
+    }
     Ok(())
 }
