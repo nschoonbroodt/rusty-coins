@@ -20,3 +20,9 @@ update on accounts begin
     set updated_at = current_timestamp
     where id = NEW.id;
 end;
+
+insert into accounts (name) values ('Assets'),
+                                   ('Liabilities'), 
+                                   ('Equity'), 
+                                   ('Revenue'), 
+                                   ('Expenses');
