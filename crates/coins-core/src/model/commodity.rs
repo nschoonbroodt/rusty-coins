@@ -8,6 +8,9 @@ pub struct Commodity {
 }
 
 impl Commodity {
+    pub fn id(&self) -> i64 {
+        self.id
+    }
     pub fn name(&self) -> &str {
         &self.name
     }
