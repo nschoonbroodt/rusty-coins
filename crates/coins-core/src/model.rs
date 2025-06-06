@@ -1,17 +1,8 @@
 pub mod account;
 pub mod commodity;
-
-use std::sync::LazyLock;
+mod migrations;
 
 use crate::prelude::*;
-
-use include_dir::{Dir, include_dir};
-use rusqlite_migration::Migrations;
-
-static MIGRATION_DIR: Dir = include_dir!("$CARGO_MANIFEST_DIR/migrations");
-// Define migrations. These are applied atomically.
-static MIGRATIONS: LazyLock<Migrations<'static>> =
-    LazyLock::new(|| Migrations::from_directory(&MIGRATION_DIR).unwrap());
 
 pub struct CoinsModel {
     pub conn: rusqlite::Connection, // TODO: remove pub
@@ -24,7 +15,7 @@ impl CoinsModel {
         } else {
             rusqlite::Connection::open_in_memory()?
         };
-        MIGRATIONS.to_latest(&mut conn).unwrap();
+        migrations::apply_migrations(&mut conn)?;
 
         Ok(Self { conn })
     }
