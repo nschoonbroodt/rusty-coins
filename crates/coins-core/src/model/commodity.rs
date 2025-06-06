@@ -83,4 +83,42 @@ mod tests {
         assert_eq!(commodities[1].name(), "US Dollar");
         assert_eq!(commodities[1].symbol(), "USD");
     }
+
+    #[test]
+    fn test_new() {
+        let model = super::super::CoinsModel::new(None).unwrap();
+        let com: Commodity = Commodity::builder(&model)
+            .name("Euro".to_string())
+            .symbol("EUR".to_string())
+            .build()
+            .unwrap();
+        assert_eq!(com.name(), "Euro");
+        assert_eq!(com.symbol(), "EUR");
+
+        println!(
+            "{}",
+            pretty_sqlite::pretty_table(&model.conn, "commodities").unwrap()
+        );
+
+        let commodities = Commodity::all(&model).unwrap();
+        assert_eq!(commodities.len(), 1);
+        assert_eq!(commodities[0].name(), "Euro");
+        assert_eq!(commodities[0].symbol(), "EUR");
+    }
+    #[test]
+    fn test_new_duplicate_symbol() {
+        let model = super::super::CoinsModel::new(None).unwrap();
+        let _: Commodity = Commodity::builder(&model)
+            .name("Euro".to_string())
+            .symbol("EUR".to_string())
+            .build()
+            .unwrap();
+        let res = Commodity::builder(&model)
+            .name("Euro".to_string())
+            .symbol("EUR".to_string())
+            .build();
+
+        // TODO check that we get the correct error type
+        res.unwrap();
+    }
 }
