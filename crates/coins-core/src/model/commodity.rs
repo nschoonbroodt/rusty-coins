@@ -19,8 +19,22 @@ impl Commodity {
         let mut stmt = model.conn.prepare(
             "INSERT INTO commodities (name, symbol) VALUES (?1, ?2) RETURNING id, name, symbol",
         )?;
+
         let mut commodity_rows = stmt.query(rusqlite::params![name, symbol])?;
-        let row = commodity_rows.next()?.unwrap();
+
+        let row = commodity_rows
+            .next()
+            .map_err(|e| {
+                if e.to_string()
+                    .contains("UNIQUE constraint failed: commodities.symbol")
+                {
+                    CoinsCoreError::CommodityAlreadyExists(symbol.clone())
+                } else {
+                    e.into()
+                }
+            })?
+            .unwrap();
+
         Ok(Self {
             id: row.get(0)?,
             name: row.get(1)?,
@@ -121,7 +135,7 @@ mod tests {
             .symbol("EUR".to_string())
             .build();
 
-        // TODO check that we get the correct error type
-        res.unwrap();
+        let x = res.unwrap_err();
+        assert_eq!(x, CoinsCoreError::CommodityAlreadyExists("EUR".to_string()));
     }
 }
