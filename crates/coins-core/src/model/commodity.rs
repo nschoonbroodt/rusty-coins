@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use bon::bon;
 
 #[derive(Debug)]
 pub struct Commodity {
@@ -7,22 +8,28 @@ pub struct Commodity {
     symbol: String,
 }
 
+#[bon]
 impl Commodity {
+    #[builder]
+    pub fn new(
+        #[builder(start_fn)] model: super::CoinsModel,
+        name: String,
+        symbol: String,
+    ) -> Self {
+        todo!();
+    }
     pub fn id(&self) -> i64 {
         self.id
     }
     pub fn name(&self) -> &str {
         &self.name
     }
-
     pub fn symbol(&self) -> &str {
         &self.symbol
     }
-}
 
-impl super::CoinsModel {
-    pub fn commodities(&self) -> Result<Vec<Commodity>> {
-        let mut stmt = self
+    pub fn all(model: &super::CoinsModel) -> Result<Vec<Self>> {
+        let mut stmt = model
             .conn
             .prepare("SELECT id, name, symbol FROM commodities")?;
         let commodities = stmt
@@ -42,15 +49,15 @@ impl super::CoinsModel {
 
 #[cfg(test)]
 mod tests {
-    use super::super::CoinsModel;
+    use super::*;
 
     #[test]
     fn test_commodities() {
-        let model = CoinsModel::new(None).unwrap();
+        let model = super::super::CoinsModel::new(None).unwrap();
         let conn = &model.conn;
 
         conn.execute(
-            r#"INSERT INTO commodities (name, symbol) VALUES ("Euro", "EUR")"#,
+            r#"INSERT INTO commodities (name, symbol) VALUES ("Euro", "EUR"), ("US Dollar", "USD")"#,
             (),
         )
         .unwrap();
@@ -60,9 +67,11 @@ mod tests {
             pretty_sqlite::pretty_table(conn, "commodities").unwrap()
         );
 
-        let commodities = model.commodities().unwrap();
-        assert_eq!(commodities.len(), 1);
+        let commodities = Commodity::all(&model).unwrap();
+        assert_eq!(commodities.len(), 2);
         assert_eq!(commodities[0].name(), "Euro");
         assert_eq!(commodities[0].symbol(), "EUR");
+        assert_eq!(commodities[1].name(), "US Dollar");
+        assert_eq!(commodities[1].symbol(), "USD");
     }
 }
