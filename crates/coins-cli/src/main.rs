@@ -1,4 +1,4 @@
-use coins_core::model::commodity::Commodity;
+use coins_core::model::{account::Account, commodity::Commodity};
 
 fn main() {
     let model = coins_core::CoinsModel::new(None).unwrap();
@@ -9,12 +9,12 @@ fn main() {
         .unwrap();
     println!("New commodity: {:?}", com);
 
-    let com: Commodity = Commodity::builder(&model)
-        .name("US Dollar".to_string())
-        .symbol("USD".to_string())
+    let account: Account = Account::builder(&model)
+        .name("My account".to_string())
         .build()
         .unwrap();
-    println!("New commodity: {:?}", com);
+    println!("New account: {:?}", account);
 
     println!("All commodities: {:?}", Commodity::all(&model).unwrap());
+    println!("All accounts: {:?}", Account::all(&model).unwrap());
 }

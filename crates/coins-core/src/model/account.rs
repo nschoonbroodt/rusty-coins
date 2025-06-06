@@ -28,11 +28,9 @@ impl Account {
     pub fn name(&self) -> &str {
         &self.name
     }
-}
 
-impl super::CoinsModel {
-    pub fn accounts(&self) -> Result<Vec<Account>> {
-        let mut stmt = self.conn.prepare("SELECT id, name FROM accounts")?;
+    pub fn all(model: &super::CoinsModel) -> Result<Vec<Self>> {
+        let mut stmt = model.conn.prepare("SELECT id, name FROM accounts")?;
         let accounts = stmt
             .query_map([], |row| {
                 Ok(Account {
@@ -62,7 +60,7 @@ mod tests {
 
         println!("{}", pretty_sqlite::pretty_table(conn, "accounts").unwrap());
 
-        let accounts = model.accounts().unwrap();
+        let accounts = Account::all(&model).unwrap();
         assert_eq!(accounts.len(), 1);
         assert_eq!(accounts[0].name(), "Account1");
     }
@@ -83,7 +81,7 @@ mod tests {
         assert_eq!(account.name(), "Test Account");
         assert!(account.id() > 0);
 
-        let accounts = model.accounts().unwrap();
+        let accounts = Account::all(&model).unwrap();
         assert!(accounts.iter().any(|a| a.id() == account.id()));
     }
 }
