@@ -12,7 +12,7 @@ pub struct Commodity {
 impl Commodity {
     #[builder]
     pub fn new(
-        #[builder(start_fn)] model: super::CoinsModel,
+        #[builder(start_fn)] model: &super::CoinsModel,
         name: String,
         symbol: String,
     ) -> Self {
