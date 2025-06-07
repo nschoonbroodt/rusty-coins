@@ -28,20 +28,28 @@ impl fmt::Display for AccountName {
 pub struct Account {
     id: i64,
     name: AccountName,
+    opening_date: Option<chrono::NaiveDate>,
+    closing_date: Option<chrono::NaiveDate>,
 }
 
 #[bon]
 impl Account {
     #[builder]
-    pub fn new(#[builder(start_fn)] model: &super::CoinsModel, name: AccountName) -> Result<Self> {
+    pub fn new(
+        #[builder(start_fn)] model: &super::CoinsModel,
+        name: AccountName,
+        opening_date: Option<chrono::NaiveDate>,
+    ) -> Result<Self> {
         let mut stmt = model
             .conn
-            .prepare("INSERT INTO accounts (name) VALUES (?1) RETURNING id, name")?;
-        let mut account_rows = stmt.query(rusqlite::params![name.0])?;
+            .prepare("INSERT INTO accounts (name, opening_date) VALUES (?1, ?2) RETURNING id, name, opening_date")?;
+        let mut account_rows = stmt.query(rusqlite::params![name.0, opening_date])?;
         let row = account_rows.next()?.unwrap();
         Ok(Self {
             id: row.get(0)?,
             name: AccountName(row.get(1)?),
+            opening_date: row.get(2)?,
+            closing_date: None,
         })
     }
 
@@ -56,12 +64,14 @@ impl Account {
     pub fn by_id(model: &super::CoinsModel, id: i64) -> Result<Option<Self>> {
         let mut stmt = model
             .conn
-            .prepare("SELECT id, name FROM accounts WHERE id = ?1")?;
+            .prepare("SELECT id, name, opening_date, closing_date FROM accounts WHERE id = ?1")?;
         let mut rows = stmt.query(rusqlite::params![id])?;
         if let Some(row) = rows.next()? {
             Ok(Some(Self {
                 id: row.get(0)?,
                 name: AccountName(row.get(1)?),
+                opening_date: row.get(2)?,
+                closing_date: row.get(3)?,
             }))
         } else {
             Ok(None)
@@ -75,13 +85,27 @@ impl Account {
         &self.name
     }
 
+    pub fn opening_date(&self) -> Option<chrono::NaiveDate> {
+        self.opening_date
+    }
+    pub fn closing_date(&self) -> Option<chrono::NaiveDate> {
+        self.closing_date
+    }
+    pub fn is_open(&self) -> bool {
+        self.closing_date.is_none()
+    }
+
     pub fn all(model: &super::CoinsModel) -> Result<Vec<Self>> {
-        let mut stmt = model.conn.prepare("SELECT id, name FROM accounts")?;
+        let mut stmt = model
+            .conn
+            .prepare("SELECT id, name, opening_date, closing_date FROM accounts")?;
         let accounts = stmt
             .query_map([], |row| {
                 Ok(Account {
                     id: row.get(0)?,
                     name: AccountName(row.get(1)?),
+                    opening_date: row.get(2)?,
+                    closing_date: row.get(3)?,
                 })
             })?
             .flatten()

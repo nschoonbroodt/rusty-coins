@@ -10,14 +10,19 @@ pub struct AccountOpt {
 #[derive(Parser, Debug)]
 enum Command {
     List,
-    Add { name: String },
-    Delete { id: i64 },
+    Add {
+        name: String,
+        opening_date: Option<chrono::NaiveDate>,
+    },
+    Delete {
+        id: i64,
+    },
 }
 
 pub fn run(model: &coins_core::CoinsModel, account_opt: AccountOpt) -> anyhow::Result<()> {
     match &account_opt.command {
         Command::List => list(model)?,
-        Command::Add { name } => add(model, name.clone())?,
+        Command::Add { name, opening_date } => add(model, name, opening_date)?,
         Command::Delete { id } => delete(model, *id)?,
     }
     Ok(())
@@ -26,14 +31,26 @@ pub fn run(model: &coins_core::CoinsModel, account_opt: AccountOpt) -> anyhow::R
 fn list(model: &coins_core::CoinsModel) -> anyhow::Result<()> {
     let accounts = Account::all(model)?;
     accounts.iter().for_each(|account| {
-        println!("Account ID: {}, Name: {}", account.id(), account.name());
+        println!(
+            "Account ID: {}, Name: {}, Opening date: {:?}",
+            account.id(),
+            account.name(),
+            account.opening_date(),
+        );
     });
     Ok(())
 }
 
-fn add(model: &coins_core::CoinsModel, name: String) -> anyhow::Result<()> {
-    let name = AccountName::new(&name).unwrap();
-    let account = Account::builder(model).name(name).build()?;
+fn add(
+    model: &coins_core::CoinsModel,
+    name: &str,
+    opening_date: &Option<chrono::NaiveDate>,
+) -> anyhow::Result<()> {
+    let name = AccountName::new(name).unwrap();
+    let account = Account::builder(model)
+        .name(name)
+        .maybe_opening_date(*opening_date)
+        .build()?;
     println!("Added account with ID: {}", account.id());
     Ok(())
 }
