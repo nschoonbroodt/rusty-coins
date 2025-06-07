@@ -1,6 +1,8 @@
 create table if not exists accounts (
     id integer primary key autoincrement,
     name text not null,
+    opening_date text,
+    closing_date text,
     created_at text default current_timestamp,
     updated_at text default current_timestamp
 ) strict;
